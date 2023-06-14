@@ -15,8 +15,9 @@ resource "github_repository" "this" {
 }
 
 resource "github_repository_deploy_key" "this" {
+  count      = data.github_repository.existing.id != null ? 0 : 1
   title      = var.public_key_openssh_title
-  repository = github_repository.this.name
+  repository = github_repository.this[count.index].name
   key        = var.public_key_openssh
   read_only  = false
 }
