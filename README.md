@@ -16,15 +16,21 @@ Outputs
 
 Remember, the outputs of a Terraform module are accessible from the root module (or module that called the sub-module). If your Github repository module is called within another module, you can access the repository_name output like this:
 
+## Usage
+
+Use the module in your Terraform code as shown below:
+
+```hcl
 module "github_repository" {
-  source                 = "github.com/bartaadalbert/tf-github-repository?ref=develop"
+  source                   = "github.com/bartaadalbert/tf-github-repository?ref=develop"
   github_owner             = var.GITHUB_OWNER
   github_token             = var.GITHUB_TOKEN
   repository_name          = var.FLUX_GITHUB_REPO
   public_key_openssh       = module.tls_private_key.public_key_openssh
-  public_key_openssh_title = "flux"
+  public_key_openssh_title = "My Deploy Key"
 }
 
 module "tls_private_key" {
   source = "github.com/den-vasyliev/tf-hashicorp-tls-keys"
 }
+
