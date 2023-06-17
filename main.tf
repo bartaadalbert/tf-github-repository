@@ -3,33 +3,23 @@ provider "github" {
   token = var.github_token
 }
 
-data "github_repository" "existing" {
-  full_name = "${var.github_owner}/${var.repository_name}"
-}
-
-locals {
-  repository_exists = data.github_repository.existing.id != null
-}
-
-# Debug output
-output "repository_exists" {
-  value = local.repository_exists
-}
-
 resource "github_repository" "this" {
-  count       = local.repository_exists ? 0 : 1
-  name        = var.repository_name
-  visibility  = var.repository_visibility
-  auto_init   = true
+  name       = var.repository_name
+  visibility = var.repository_visibility
+  auto_init  = true
   lifecycle {
-    ignore_changes = [auto_init]
+    ignore_changes = [name, visibility]
   }
 }
 
+data "github_repository" "existing" {
+  full_name = "${var.github_owner}/${var.repository_name}"
+  depends_on = [github_repository.this]
+}
+
 resource "github_repository_deploy_key" "this" {
-  count      = local.repository_exists ? 1 : 0
-  repository = local.repository_exists ? data.github_repository.existing.name : null
   title      = var.public_key_openssh_title
+  repository = data.github_repository.existing.name
   key        = var.public_key_openssh
   read_only  = false
 }
