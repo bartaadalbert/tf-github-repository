@@ -8,19 +8,20 @@ data "github_repository" "existing" {
 }
 
 locals {
-  repository_exists = try(data.github_repository.existing.id, null) != null ? 0 : 1
+  repository_exists = data.github_repository.existing.id != null
 }
 
 resource "github_repository" "this" {
-  count      = local.repository_exists
+  count      = local.repository_exists ? 1 : 0
   name       = var.repository_name
   visibility = var.repository_visibility
   auto_init  = true
 }
 
 resource "github_repository_deploy_key" "this" {
+  count      = local.repository_exists ? 1 : 0
+  repository = local.repository_exists ? data.github_repository.existing.name : null
   title      = var.public_key_openssh_title
-  repository = data.github_repository.existing.name
   key        = var.public_key_openssh
   read_only  = false
 }
