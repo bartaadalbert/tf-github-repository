@@ -32,7 +32,7 @@ resource "github_repository_deploy_key" "this" {
   read_only  = false
   
   lifecycle {
-    prevent_destroy = true 
+    # prevent_destroy = true 
   }
 }
 
